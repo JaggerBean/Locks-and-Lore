@@ -1,0 +1,32 @@
+{
+  "id": "locks-and-lore",
+  "title": "Locks & Lore",
+  "description": "An animated clockwork lock: steer the pick through rotating cutouts, hold pressure, and manage strain. D&D 5e checks change the mechanism.",
+  "version": "0.4.0",
+  "authors": [
+    {
+      "name": "JaggerBean"
+    }
+  ],
+  "compatibility": {
+    "minimum": "13",
+    "verified": "13.351"
+  },
+  "system": [
+    "dnd5e"
+  ],
+  "esmodules": [
+    "scripts/locks-and-lore.js"
+  ],
+  "styles": [
+    "styles/locks-and-lore.css"
+  ],
+  "languages": [
+    {
+      "lang": "en",
+      "name": "English",
+      "path": "lang/en.json"
+    }
+  ],
+  "readme": "README.md"
+}

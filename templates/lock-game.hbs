@@ -1,0 +1,22 @@
+<section class="ll-shell {{lock.archetype}} {{lock.environment}}">
+  <header class="ll-header"><div class="ll-emblem">{{lock.symbol}}</div><div><small>LOCKS & LORE</small><h1>{{lock.name}}</h1><p>{{archetypeLabel}} · {{difficultyLabel}}</p></div>{{#if danger}}<span class="ll-tag danger">Linked ward</span>{{/if}}</header>
+  {{#if ready}}
+    <div class="ll-ready-grid">
+      <div class="ll-demo" data-workbench></div>
+      <div class="ll-briefing">
+        <ol><li><b>Thread the cutout</b><span>Move your mouse around the lock. The pick follows your angle.</span></li><li><b>Turn and follow</b><span>Hold Space or mouse button. Follow the cutout; an amber cue warns before it reverses.</span></li><li><b>Ease off when it binds</b><span>Wrong clicks bend the pick and make its tip wobble. Release to recover. Detents save progress.</span></li></ol>
+        <div class="ll-controls-guide"><b>Controls</b><p>Aim: mouse movement, <kbd>←</kbd> <kbd>→</kbd>, or <kbd>A</kbd> <kbd>D</kbd>.</p><p>Turn: hold <kbd>Space</kbd>, left mouse button, or “Hold to turn”.</p><p>Release pressure to reduce strain. Touch: drag to aim; use the on-screen buttons.</p></div>
+        <p class="ll-character">{{character}}</p>
+        {{#if checkEnabled}}<div class="ll-roll-card"><button type="button" data-action="skill" {{#unless canSkill}}disabled{{/unless}}>{{checkLabel}}</button><p>{{skillText}}</p></div>{{/if}}
+      </div>
+    </div>
+    <div class="ll-options"><label><input type="checkbox" data-option="sound" {{checked sound}}> Mechanical sound</label></div>
+    <div class="ll-actions"><button type="button" data-action="practice" {{#if busy}}disabled{{/if}}>Practice · no consequences</button><button type="button" data-action="begin" class="ll-primary" {{#if busy}}disabled{{/if}}>Put pick to lock →</button></div>
+  {{else if playing}}
+    <div data-workbench></div>
+    <footer class="ll-footer"><span>Mouse / ← → / A D aim · hold Space / left click to turn · release to cool</span>{{#if practice}}<span class="ll-tag">Practice</span>{{/if}}<button type="button" data-action="close">Withdraw</button></footer>
+  {{else}}
+    <div data-result></div>
+    <div class="ll-actions">{{#if canRetry}}<button type="button" data-action="retry">{{#if practice}}Practice again{{else}}New attempt{{/if}}</button>{{/if}}<button type="button" class="ll-primary" data-action="close">Close</button></div>
+  {{/if}}
+</section>

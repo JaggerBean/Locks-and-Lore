@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,"><title>Locks & Lore · Playable Workshop</title><link rel="stylesheet" href="styles/locks-and-lore.css">
+<style>body{margin:0;background:#0b110e;color:#eadfc8;font:14px Georgia,serif}*{box-sizing:border-box}main{width:min(100% - 32px,1060px);margin:34px auto;display:grid;grid-template-columns:300px minmax(0,660px);gap:28px;align-items:start}.workshop-side{padding:22px;border:1px solid #454e3b;background:#19221b;border-radius:10px}.workshop-side small{color:#c7ad71;letter-spacing:2px;font:10px sans-serif}.workshop-side h1{font-size:28px;margin:12px 0 16px}.workshop-side p{color:#abb49d;font:13px/1.65 sans-serif}.workshop-side label{display:block;margin:16px 0 6px;font:12px sans-serif;color:#d5d4bd}.workshop-side select{width:100%;padding:9px;border:1px solid #576345;border-radius:4px;background:#243124;color:#eee5ca}.workshop-side .check{display:flex;align-items:center;gap:7px}.workshop-side input{accent-color:#d8b574}.workshop-side .ll-primary{width:100%;margin-top:20px}.workshop-game{border:1px solid #5c5940;border-radius:12px;overflow:hidden;box-shadow:0 18px 60px #0006}.workshop-side a{color:#d8b574}#finish:empty{display:none}.workshop-tip{padding:16px 24px;color:#babca5;font:12px/1.65 sans-serif;border-top:1px solid #454d3d}.workshop-tip b{color:#dfc58a}.ll-footer{justify-content:space-between}.ll-footer a{color:#b8c6a9;text-decoration:none}@media(max-width:850px){main{grid-template-columns:1fr;max-width:660px;margin:15px auto}.workshop-side h1{font-size:22px}.workshop-side{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}.workshop-side>small,.workshop-side>h1,.workshop-side>p,.workshop-side>button{grid-column:1/-1}}</style></head>
+<body><main class="locks-and-lore"><aside class="workshop-side"><small>PLAYABLE WORKSHOP · 0.4</small><h1>The Clockwork Lock</h1><p>Thread the pick through the cutout and track its changing direction. Strain makes the tip wobble. Release pressure to regain control.</p>
+<div><label for="difficulty">Difficulty preset</label><select id="difficulty" name="difficulty"><option>Easy</option><option selected>Moderate</option><option>Hard</option><option>Very Hard</option><option value="Extreme">Expert</option></select></div>
+<div class="ll-tuning"><label for="shifting">Lock shifting rate <output data-tuning-label="shiftingRate"></output></label><input id="shifting" name="shiftingRate" type="range" min="0" max="100" step="1" value="25"><div class="ll-scale"><span>Easy · slow</span><span>Expert · frequent</span></div></div>
+<div class="ll-tuning"><label for="lock-size">Lock size <output data-tuning-label="lockSize"></output></label><input id="lock-size" name="lockSize" type="range" min="0" max="100" step="1" value="25"><div class="ll-scale"><span>Easy · wide cutout</span><span>Expert · narrow</span></div></div>
+<div><label for="rings">Ward rings</label><select id="rings"><option>3</option><option>4</option><option selected>5</option><option>6</option><option>7</option><option>8</option></select></div>
+<div><label for="construction">Construction</label><select id="construction"><option value="standard">Clockwork ward lock</option><option value="heavy">Strongbox</option><option value="trapped">Spring trap</option></select></div>
+<div><label for="environment">Environment</label><select id="environment"><option value="none">None</option><option value="underwater">Underwater · 45s</option><option value="storm">Ship in a storm</option><option value="rusted">Rusted</option><option value="damaged">Damaged</option></select></div>
+<div><label for="picks">Starting picks</label><input id="picks" name="pickCount" type="number" min="1" max="20" value="3"></div>
+<button id="tune" type="button">Full DM tuning</button>
+<label class="check"><input type="checkbox" id="sound" checked> Mechanical sound</label>
+<button class="ll-primary" id="start">Try the lock →</button><p>Mouse / ← → / A D: aim the pick.<br>Hold Space / left mouse button / Hold to turn: turn.<br>Release: reduce strain.<br>Touch: drag to aim; use the on-screen buttons.<br><br>Workshop runs stay local. No rolls, chat messages, or world changes.</p></aside>
+<section class="workshop-game ll-shell"><header class="ll-header"><div class="ll-emblem">⚓</div><div><small>LOCKS & LORE</small><h1>The Captain's Lock</h1><p id="subtitle">Moderate · five rotating wards</p></div><span class="ll-tag">Practice</span></header><div id="stage"></div><div id="finish"></div><div class="workshop-tip"><b>Watch the metal.</b> Amber cutout lips warn before a reversal. Green arcs and square detents save progress. Red springs jam and build tension. A strained pick wobbles at its actual contact point.</div><footer class="ll-footer"><span>Same mechanism used by the Foundry module</span><button id="reset">Reset</button></footer></section>
+</main><dialog id="dm-tuning" class="locks-and-lore ll-config"><button type="button" id="close-tuning" aria-label="Close DM tuning">Close</button><div id="tuning-form"></div></dialog><script src="/scripts/handlebars.min.js"></script><script type="module">
+import { Workbench, resultMarkup } from './scripts/workbench.mjs';
+import { bindTuning } from './scripts/tuning.mjs';
+import { normalizeLock, presetValues } from './scripts/mechanism.mjs';
+import { tuningGroups } from './scripts/settings.mjs';
+import { CHECK_CHOICES } from './scripts/checks.mjs';
+const $ = id => document.getElementById(id);
+let customTuning={}, tuningPreview;
+bindTuning(document.querySelector('.workshop-side'));
+$('difficulty').addEventListener('change',()=>{customTuning={...customTuning,...presetValues($('difficulty').value)};});
+function currentLock() {return normalizeLock({...customTuning,difficulty:$('difficulty').value,shiftingRate:Number($('shifting').value),lockSize:Number($('lock-size').value),pickCount:Number($('picks').value),pins:Number($('rings').value),archetype:$('construction').value,environment:$('environment').value});}
+function start(preview=false) {
+  window.lockWorkbench?.destroy();
+  $('finish').innerHTML=''; $('stage').hidden=false;
+  const lock=currentLock();
+  document.querySelector('.workshop-game h1').textContent=lock.name;
+  $('subtitle').textContent=(lock.difficulty==='Extreme'?'Expert':lock.difficulty)+' · '+lock.pins+' rotating wards';
+  document.querySelector('.workshop-game').className='workshop-game ll-shell '+lock.archetype+' '+lock.environment;
+  window.lockWorkbench=new Workbench($('stage'),lock,{preview,sound:$('sound').checked},{finish(engine){
+    window.lockWorkbench.destroy(); $('stage').hidden=true; $('finish').innerHTML=resultMarkup(engine,true);
+  }});
+  if (!preview) $('stage').querySelector('canvas').focus({preventScroll:true});
+}
+$('start').addEventListener('click',()=>start()); $('reset').addEventListener('click',()=>start());
+$('tune').addEventListener('click',async()=>{
+  const lock=currentLock(), choices=(items,value)=>items.map(item=>({...item,selected:item.value===value}));
+  const options=(id)=>[...$(id).options].map(o=>({value:o.value,label:o.textContent}));
+  Handlebars.registerHelper('checked',value=>value?'checked':'');
+  const template=Handlebars.compile(await(await fetch('./templates/lock-config.hbs')).text());
+  $('tuning-form').innerHTML=template({lock,tuningGroups:tuningGroups(lock),difficulties:choices(options('difficulty'),lock.difficulty),archetypes:choices(options('construction'),lock.archetype),environments:choices(options('environment'),lock.environment),
+    tools:choices([{value:'ordinary',label:"Thieves' tools"},{value:'fine',label:'Fine picks'},{value:'improvised',label:'Improvised'}],lock.toolQuality),noises:choices(['Low','Moderate','High'].map(value=>({value,label:value})),lock.noise),checks:choices(CHECK_CHOICES,lock.checkType),
+    proficiencies:choices([{value:'auto',label:'Automatic · character sheet'},{value:'proficient',label:'Proficient'},{value:'not',label:'Not proficient'}],lock.proficiencyOverride),rewards:choices([{value:'physical',label:'Physical boost'},{value:'progress',label:'Banked progress'}],lock.rewardStyle)});
+  const form=$('tuning-form').querySelector('form');
+  const read=()=>{const data=Object.fromEntries(new FormData(form));form.querySelectorAll('input[type=checkbox]').forEach(input=>{data[input.name]=input.checked;});return normalizeLock(data);};
+  const preview=()=>{tuningPreview?.destroy();tuningPreview=new Workbench(form.querySelector('[data-config-preview]'),read(),{preview:true,sound:false});const p=tuningPreview.engine.profile;form.querySelector('[data-config-summary]').textContent=`${p.picks} picks · ${(p.aperture*2*180/Math.PI).toFixed(1)}° opening · ${p.speed.toFixed(2)} rad/s`;};
+  const apply=(launch)=>{if(!form.reportValidity())return;customTuning=read();for(const [id,key] of Object.entries({difficulty:'difficulty',shifting:'shiftingRate','lock-size':'lockSize',picks:'pickCount',rings:'pins',construction:'archetype',environment:'environment'}))$(id).value=customTuning[key];$('shifting').dispatchEvent(new Event('input',{bubbles:true}));$('lock-size').dispatchEvent(new Event('input',{bubbles:true}));$('dm-tuning').close();if(launch)start();else start(true);};
+  const save=form.querySelector('[data-save-defaults]');save.textContent='Apply tuning locally';save.addEventListener('click',()=>apply(false));
+  form.querySelector('[type=submit]').textContent='Apply and try lock';form.addEventListener('submit',event=>{event.preventDefault();apply(true);});
+  bindTuning(form,preview);$('dm-tuning').showModal();preview();
+});
+$('close-tuning').addEventListener('click',()=>$('dm-tuning').close());
+$('dm-tuning').addEventListener('close',()=>tuningPreview?.destroy());
+window.addEventListener('pagehide',()=>{window.lockWorkbench?.destroy();tuningPreview?.destroy();});
+start(true);
+</script></body></html>

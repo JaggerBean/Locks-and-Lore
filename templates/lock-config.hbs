@@ -1,0 +1,31 @@
+<form class="ll-config-form">
+  <header class="ll-config-heading"><h2>DM lock tuning</h2><p class="notes">Choose a preset, then tune each setting independently. Players cannot change these settings.</p></header>
+  <div class="ll-config-layout"><div class="ll-config-settings">
+    <fieldset><legend>Encounter</legend>
+      <div class="form-group"><label>Name</label><input name="name" value="{{lock.name}}" maxlength="80" required></div>
+      <div class="form-group"><label>Difficulty preset</label><select name="difficulty">{{#each difficulties}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <p class="notes">Changing the preset resets all numeric gameplay and reward settings below, including picks and DC.</p>
+      <div class="form-group"><label>Construction</label><select name="archetype">{{#each archetypes}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="form-group"><label>Environment</label><select name="environment">{{#each environments}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="form-group"><label>Tool quality</label><select name="toolQuality">{{#each tools}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="form-group"><label>Deadline (seconds)</label><input name="timeLimit" type="number" min="0" max="600" value="{{lock.timeLimit}}" required></div><p class="notes">0 means no deadline, including underwater. Set 45 for a breath limit.</p>
+      <div class="form-group"><label>Noise on failure</label><select name="noise">{{#each noises}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="form-group"><label>Ward rings</label><input name="pins" type="number" min="3" max="8" value="{{lock.pins}}" required></div>
+      <div class="form-group"><label>Engraved symbol</label><input name="symbol" value="{{lock.symbol}}" maxlength="6"></div>
+      <div class="form-group"><label>Linked spring trap</label><input type="checkbox" name="trapped" {{checked lock.trapped}}></div>
+      <div class="form-group"><label>Allow retry</label><input type="checkbox" name="canRetry" {{checked lock.canRetry}}></div>
+    </fieldset>
+    <fieldset><legend>Player check</legend>
+      <div class="form-group"><label>Enable check</label><input type="checkbox" name="checkEnabled" {{checked lock.checkEnabled}}></div>
+      <div class="form-group"><label>Check type</label><select name="checkType">{{#each checks}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <div class="form-group"><label>Proficiency override</label><select name="proficiencyOverride">{{#each proficiencies}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <p class="notes">Automatic uses the prepared character bonus. Proficient forces one proficiency bonus; Not proficient removes proficiency, including expertise. This changes the roll only, not the character sheet.</p>
+      <div class="form-group"><label>Reward style</label><select name="rewardStyle">{{#each rewards}}<option value="{{value}}" {{#if selected}}selected{{/if}}>{{label}}</option>{{/each}}</select></div>
+      <p class="notes">Head start: success banks one-third of the first ring; natural 20 opens the first ring. Physical boost uses the reward sliders below. Natural 20 always earns the critical reward.</p>
+    </fieldset>
+    {{#each tuningGroups}}<details class="ll-setting-group" open><summary>{{title}}</summary>
+      {{#each fields}}<div class="ll-setting"><label for="ll-{{key}}">{{label}} <small>{{unit}}</small></label><div class="ll-setting-inputs"><input type="range" min="{{min}}" max="{{max}}" step="{{step}}" value="{{value}}" data-pair="{{key}}" aria-label="{{label}} slider"><input id="ll-{{key}}" name="{{key}}" type="number" min="{{min}}" max="{{max}}" step="{{step}}" value="{{value}}" required aria-label="{{label}} value"></div><p class="notes">{{hint}}</p></div>{{/each}}
+    </details>{{/each}}
+  </div><aside class="ll-config-preview"><b>Mechanism preview</b><div class="ll-demo" data-config-preview></div><p data-config-summary class="notes"></p><p class="notes">Preview includes construction, tool, and environment modifiers. Check rewards apply only after a successful player roll.</p><p class="notes">Spring tuning applies when a linked spring trap is present. Releasing pressure defuses spring tension; 100% trips the trap.</p></aside></div>
+  <footer class="sheet-footer ll-config-footer"><button type="button" data-save-defaults>Save world defaults</button><button type="submit" class="ll-primary">Launch encounter</button></footer>
+</form>

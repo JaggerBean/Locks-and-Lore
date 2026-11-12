@@ -1,0 +1,12 @@
+{
+  "schema": 1,
+  "id": "locks-and-lore",
+  "name": "Locks & Lore",
+  "type": "foundry-module",
+  "author": "Jagger",
+  "description": "An animated clockwork lock-picking mini-game for Foundry VTT (D&D 5e): steer the pick through rotating cutouts, hold pressure and manage strain. The GM builds and tunes each lock.",
+  "tags": [
+    "Foundry VTT",
+    "D&D 5e"
+  ]
+}
